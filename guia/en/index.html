@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MovieFlow: 13 models — which one to use for each scene</title>
+<meta name="description" content="MovieFlow's 13 video and image models (Seedance, Kling, Veo, MiniMax, Vidu, Nano Banana, GPT Image, Seedream): what each does well, its limits, and when to use it.">
+<link rel="alternate" hreflang="pt-BR" href="https://inematds.github.io/movieflow-modelos/guia/">
+<link rel="alternate" hreflang="en" href="https://inematds.github.io/movieflow-modelos/guia/en/">
+<link rel="alternate" hreflang="es" href="https://inematds.github.io/movieflow-modelos/guia/es/">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0c10; --bg2:#14141b; --card:#16161e; --line:#272730;
+    --txt:#e9e9ee; --mut:#9a9aa6; --amb:#E2A23B; --amb2:#f0c070; --sky:#38bdf8; --pro:#cbd5e1;
+    color-scheme:dark;
+  }
+  body.light{
+    --bg:#f6f7f9; --bg2:#eceef2; --card:#ffffff; --line:#e1e3ea;
+    --txt:#1a1a22; --mut:#5b5b68; --amb:#b9791d; --amb2:#a16207; --sky:#0369a1; --pro:#b45309;
+    color-scheme:light;
+  }
+  body.light .hero .glow{opacity:.5}
+  body.light pre{background:#0e0e14;color:#d6d6e0}
+  body.light pre .c{color:#8a8a98}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Sora,sans-serif;line-height:1.15;margin:0}
+  a{color:var(--amb);text-decoration:none}
+  code,pre{font-family:"JetBrains Mono",monospace}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+  .mut{color:var(--mut)} .amb{color:var(--amb)}
+  .chip{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amb);font-weight:600;font-family:Sora}
+  nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(12,12,16,.78);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:22px;height:60px}
+  nav .brand{display:flex;align-items:center;gap:8px;font-family:Sora;font-weight:800;letter-spacing:-.02em;color:var(--amb)}
+  nav .brand .emoji{font-size:1.25rem}
+  nav .sep{color:var(--mut);opacity:.45}
+  nav .inema{color:var(--sky);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .inema:hover{filter:brightness(1.15)}
+  nav .pro{color:var(--pro);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .pro:hover{filter:brightness(1.15)}
+  nav .clubpro{display:inline-flex;align-items:center;gap:6px}
+  nav .links{margin-left:auto;display:flex;align-items:center;gap:20px;font-size:.92rem}
+  nav .links a.sec{color:var(--mut)} nav .links a.sec:hover{color:var(--txt)}
+  .lang{display:inline-flex;gap:2px;font-family:Sora;font-size:.78rem}
+  .lang a{color:var(--mut);padding:.2em .45em;border-radius:6px} .lang a.on{color:var(--amb);background:rgba(226,162,59,.12)}
+  .tgl{background:var(--bg2);border:1px solid var(--line);color:var(--txt);width:38px;height:38px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem}
+  .tgl:hover{border-color:var(--amb)}
+  .btn{display:inline-block;background:var(--amb);color:#1a1206;font-weight:600;padding:.6em 1.05em;border-radius:10px;font-family:Sora}
+  .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+  @media(max-width:760px){nav .links a.sec{display:none}}
+  @media(max-width:520px){nav .wrap{gap:8px;padding:8px 14px;height:auto;flex-wrap:wrap} nav .links{gap:8px;margin-left:0;width:100%;justify-content:space-between} nav .btn{padding:.45em .7em;font-size:.82rem} .tgl{width:34px;height:34px}}
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .hero .glow{position:absolute;inset:-40% -20% auto auto;width:70%;height:600px;background:radial-gradient(closest-side,rgba(226,162,59,.22),transparent 70%);pointer-events:none}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:74px 22px}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;letter-spacing:-.025em}
+  .hero p.lead{font-size:1.18rem;color:var(--mut);margin:1.1em 0 1.6em;max-width:34ch}
+  .hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .hero figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -30px #000}
+  .hero figure img{width:100%;height:auto;display:block}
+  .resumo{padding:38px 0 34px;border-bottom:1px solid var(--line)}
+  .resumo p{font-size:1.12rem;line-height:1.7;max-width:74ch;margin:.55em 0 0}
+  @media(max-width:780px){.hero .wrap{grid-template-columns:1fr;padding:48px 22px}}
+  section{padding:62px 0;border-bottom:1px solid var(--line)}
+  section h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800;letter-spacing:-.02em}
+  section .sub{color:var(--mut);margin:.6em 0 2em;max-width:62ch}
+  .grid{display:grid;gap:16px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:820px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{font-size:1.05rem;margin-bottom:.4em}
+  .card p{color:var(--mut);font-size:.92rem;margin:0}
+  .num{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:rgba(226,162,59,.14);color:var(--amb);font-family:Sora;font-weight:800;font-size:.9rem;margin-bottom:.7em}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .flow span{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:.45em .9em;font-size:.85rem;font-family:Sora;font-weight:600}
+  .flow .arr{color:var(--amb);border:none;background:none;padding:0 .1em}
+  pre{background:#0a0a0e;border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;font-size:.86rem;line-height:1.6;color:#d6d6e0}
+  pre .c{color:#6f6f7c} pre .k{color:var(--amb2)} pre .s{color:#9ece6a}
+  .step{display:grid;grid-template-columns:46px minmax(0,1fr);gap:16px;margin-bottom:26px}
+  .step>div,.card{min-width:0}
+  p code,li code,td code{overflow-wrap:anywhere}
+  .step .b{width:46px;height:46px;border-radius:12px;background:var(--amb);color:#1a1206;font-family:Sora;font-weight:800;font-size:1.25rem;display:flex;align-items:center;justify-content:center}
+  .step h3{font-size:1.12rem;margin-bottom:.3em}
+  .step p{color:var(--mut);margin:.2em 0 .7em}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.ex{grid-template-columns:1fr}}
+  .ex figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .ex figure img{width:100%;height:auto;display:block}
+  .ex figcaption{padding:12px 14px;font-size:.88rem;color:var(--mut);background:var(--card)}
+  .phase{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .phase:last-child{border:none}
+  .phase .tag{flex:0 0 92px;font-family:Sora;font-weight:800;color:var(--amb)}
+  .phase .d strong{display:block;margin-bottom:.2em}
+  .phase .d span{color:var(--mut);font-size:.92rem}
+  footer{padding:46px 0;text-align:center;color:var(--mut);font-size:.9rem}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.3em .8em;font-size:.78rem;color:var(--mut);margin:0 4px}
+
+  .mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .mod{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0;transition:border-color .2s,transform .2s}
+  .mod.on{border-color:var(--amb);transform:translateY(-2px);box-shadow:0 0 0 2px color-mix(in srgb,var(--amb) 35%,transparent)}
+  .mod.off{opacity:.38}
+  .mod h3{font-size:1.05rem;margin:0 0 .2em}
+  .mod .fab{font-size:.78rem;color:var(--mut)}
+  .mod .tp{float:right;font-size:.7rem;font-family:Sora;font-weight:700;border-radius:999px;padding:.15em .6em;border:1px solid var(--line);color:var(--amb)}
+  .mod p{margin:.55em 0 0;font-size:.9rem}
+  .mod .q{color:var(--txt)} .mod .l{color:var(--mut);font-size:.82rem}
+  .mod .meta{margin-top:.6em;font-size:.78rem;color:var(--mut)}
+  .mod .src{margin-top:.4em;font-size:.74rem;word-break:break-word}
+  .need{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 18px}
+  .need button{font:600 .85rem Sora,sans-serif;background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:999px;padding:.5em 1em;cursor:pointer}
+  .need button.on{background:var(--amb);color:#1a1206;border-color:var(--amb)}
+  .tbl{width:100%;border-collapse:collapse;font-size:.88rem}
+  .tbl th,.tbl td{border-bottom:1px solid var(--line);padding:.55em .5em;text-align:left;vertical-align:top}
+  .tbl th{font-family:Sora;color:var(--amb);font-size:.8rem}
+  .scroll{overflow-x:auto}
+  @media(max-width:680px){.flow{flex-direction:column;align-items:flex-start}.flow .arr{transform:rotate(90deg);margin-left:14px}}
+  .gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px 18px;font-size:.9rem}
+  .gl div{color:var(--mut)} .gl strong{color:var(--txt)}
+  .note{font-size:.85rem;color:var(--mut);border-left:3px solid var(--amb);padding:.4em .9em;margin:14px 0}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="#top"><span class="emoji">🎬</span> MovieFlow: 13 models</a>
+  <span class="sep">|</span>
+  <span class="clubpro">
+    <a class="inema" href="https://inema.club" target="_blank" rel="noopener">INEMA.CLUB</a>
+    <span class="sep">-</span>
+    <a class="pro" href="https://inema.pro" target="_blank" rel="noopener">PRO</a>
+  </span>
+  <div class="links">
+    <a class="sec" href="#modelos">Models</a>
+    <a class="sec" href="#escolher">Which to use</a>
+    <a class="sec" href="#fluxo">How it works</a>
+    <a class="sec" href="#guia">User guide</a>
+    <a class="sec" href="#preco">Pricing</a>
+    <span class="lang"><a href="../">PT</a><a class="on" href="./">EN</a><a href="../es/">ES</a></span>
+    <button class="tgl" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+    <a class="btn" href="https://github.com/inematds/movieflow-modelos" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</div></nav>
+
+<header class="hero" id="top">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div>
+      <span class="chip">AI filmmaking · November 2026</span>
+      <h1>Every scene in your film needs the <span class="amb">right model</span></h1>
+      <p class="lead">MovieFlow brings 13 video and image models together in one place. This guide explains what each does well, where it falls short, and which one to choose for your scene.</p>
+      <div class="cta">
+        <a class="btn" href="#escolher">Choose my model</a>
+        <a class="btn ghost" href="https://github.com/inematds/movieflow-modelos" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+    </div>
+    <figure><img src="../assets/banner-en.jpg" alt="MovieFlow banner: 13 models — which model to use for each scene in your AI film"></figure>
+  </div>
+</header>
+
+<section id="resumo" class="resumo"><div class="wrap">
+  <span class="chip">At a glance</span>
+  <p>MovieFlow (movieflow.ai) is an AI filmmaking studio: you write an idea, and it builds the story, characters, scenes, and film. It uses 13 models from other companies (Seedance, Kling, Veo, MiniMax, Vidu, Nano Banana, GPT Image, Seedream, and others), each best at a different task. This project brings together what each model does, its limits, and when to use it in a guide and a data file. Just read the page to use it; if you want, you can run the chooser in the terminal with Python, without installing anything.</p>
+</div></section>
+
+<section id="oque"><div class="wrap">
+  <span class="chip">What it is</span>
+  <h2>A model hub, not a single model</h2>
+  <p class="sub">In 2025, MovieFlow was marketed as “a free film up to 10 minutes long.” Today, it charges for credits and has become a dashboard where you choose the engine for each scene.</p>
+  <figure style="margin:0 0 26px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -30px #000"><img src="../assets/banner-grade-en.jpg" alt="MovieFlow's main models: Seedance 2.5, Kling 3.0, Veo 3, MiniMax H3, Nano Banana, and GPT Image 2" loading="lazy" style="width:100%;display:block"></figure>
+  <div class="grid g3">
+    <div class="card"><h3>🎬 9 video models</h3><p>Seedance 2.5, 2.0 and Fast, Kling 3.0 and 2.6, MiniMax H3, Vidu Q3 Pro, Veo 3, and MovieFlow 2.0 Ultra.</p></div>
+    <div class="card"><h3>🖼️ 4 image models</h3><p>Nano Banana Pro and 2, GPT Image 2, and Seedream 5.0 for characters, keyframes, posters, and storyboards.</p></div>
+    <div class="card"><h3>🧭 When to use each one</h3><p>A “use when” line for each model, its limits, and the sources. When sources conflict, the page says so.</p></div>
+  </div>
+</div></section>
+
+<section id="escolher"><div class="wrap">
+  <span class="chip">Which to use</span>
+  <h2>What does your scene need?</h2>
+  <p class="sub">Tap a need: the answer appears below and the recommended models light up on their cards.</p>
+  <div class="need" id="need">
+<button type="button" data-ids="movieflow-2.0-ultra,seedance-fast,nano-banana-2">Low-cost draft</button>
+<button type="button" data-ids="veo-3,kling-3.0,vidu-q3-pro">Dialogue with lip-sync</button>
+<button type="button" data-ids="kling-3.0,kling-2.6">Action with cuts</button>
+<button type="button" data-ids="seedance-2.5">Long shot with sound</button>
+<button type="button" data-ids="seedance-2.0,seedance-2.5,minimax-h3">Same character</button>
+<button type="button" data-ids="vidu-q3-pro">Anime / cartoon</button>
+<button type="button" data-ids="minimax-h3">Sharp 2K image</button>
+<button type="button" data-ids="kling-2.6,seedance-2.0">Copy movement</button>
+<button type="button" data-ids="nano-banana-pro,gpt-image-2">Text in the image</button>
+<button type="button" data-ids="nano-banana-2,gpt-image-2">Quick storyboard</button>
+<button type="button" data-ids="minimax-h3,seedream-5.0,gpt-image-2">Fix part of an image</button>
+  </div>
+  <p class="note" id="resp" hidden></p>
+</div></section>
+
+<section id="modelos"><div class="wrap">
+  <span class="chip">The 13 models</span>
+  <h2>What each model does well</h2>
+  <p class="sub">Data from public pages read on 06/11/2026. “conflicting” = sources disagree; “not confirmed” = no source found.</p>
+  <div class="mods" id="mods">
+<div class="mod" data-id="seedance-2.5"><span class="tp">VIDEO</span><h3>Seedance 2.5</h3><span class="fab">ByteDance</span><p class="q"><strong>Use when</strong> the scene needs a long shot, sound, and the same character as in the references.</p><p>Long shot (up to 30 s) with sound and many references.</p><p class="l">Limits: resolution is conflicting across sources (720p to 1080p); automatic duration can double the cost.</p><div class="meta">Max duration: 30 s · Audio: yes</div><div class="src"><a href="https://docs.sogni.ai/models/seedance-2-5/" target="_blank" rel="noopener">source 1</a> · <a href="https://rgb.ir/en/ai/seedance-2-5/" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="movieflow-2.0-ultra"><span class="tp">VIDEO</span><h3>MovieFlow 2.0 Ultra</h3><span class="fab">MovieFlow</span><p class="q"><strong>Use when</strong> you want to test an idea or storyboard quickly before spending on an expensive model.</p><p>The site's fastest and cheapest: 5 s of video in 10 s, US$0.008 per second.</p><p class="l">Limits: resolution, audio, and maximum duration are not published outside the site.</p><div class="meta">Max duration: not confirmed · Audio: not confirmed</div><div class="src"><a href="https://movieflow.ai" target="_blank" rel="noopener">source 1</a></div></div>
+<div class="mod" data-id="minimax-h3"><span class="tp">VIDEO</span><h3>MiniMax H3</h3><span class="fab">MiniMax (Hailuo)</span><p class="q"><strong>Use when</strong> you need a sharp image, a character that sticks to the references, or a way to fix a detail in a finished clip.</p><p>Native 2K video, multiple references, and edits to a detail without remaking the clip.</p><p class="l">Limits: maximum duration is cited by only one source.</p><div class="meta">Max duration: ~15 s (not confirmed) · Audio: yes</div><div class="src"><a href="https://comfyui-wiki.com/en/models/minimax/minimax-h3" target="_blank" rel="noopener">source 1</a> · <a href="https://openart.ai/blog/minimax-h3-overview/" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="kling-3.0"><span class="tp">VIDEO</span><h3>Kling 3.0</h3><span class="fab">Kuaishou</span><p class="q"><strong>Use when</strong> the scene has cuts (shot and reverse shot, action sequence) and strong movement, with synchronized speech.</p><p>Multi-shot: 2 to 6 connected shots in one generation, with the same character.</p><p class="l">Limits: resolution is conflicting (1080p to 4K); Portuguese audio not confirmed.</p><div class="meta">Max duration: 15 s · Audio: yes, with lip-sync</div><div class="src"><a href="https://apiframe.ai/guides/kling-3-0-guide" target="_blank" rel="noopener">source 1</a> · <a href="https://gaga.art/blog/kling-3-0/" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="seedance-2.0"><span class="tp">VIDEO</span><h3>Seedance 2.0</h3><span class="fab">ByteDance</span><p class="q"><strong>Use when</strong> you want to copy the movement or style of a reference video and keep the character consistent across multiple clips.</p><p>Up to 9 images + 3 videos + 3 audio references, called in the prompt (@Image1, @Video1).</p><p class="l">Limits: resolution is conflicting (480p to 4K); audio references up to 15 s and must be paired with an image or video.</p><div class="meta">Max duration: 15 s · Audio: yes</div><div class="src"><a href="https://help.artlist.io/hc/en-us/articles/37101319322909-Seedance-2-0-Family" target="_blank" rel="noopener">source 1</a> · <a href="https://apiframe.ai/guides/seedance-2.0-guide" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="vidu-q3-pro"><span class="tp">VIDEO</span><h3>Vidu Q3 Pro</h3><span class="fab">ShengShu</span><p class="q"><strong>Use when</strong> there is a conversation between two or more characters, or the style is anime/animation.</p><p>Dialogue with multiple speakers, automatic cuts, good at anime.</p><p class="l">Limits: duration range and resolutions are conflicting; Portuguese audio not confirmed.</p><div class="meta">Max duration: 16 s · Audio: yes</div><div class="src"><a href="https://blogs.novita.ai/vidu-q3-pro-on-novita-ai" target="_blank" rel="noopener">source 1</a> · <a href="https://developers.cloudflare.com/ai/models/vidu/q3-pro/index.md" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="veo-3"><span class="tp">VIDEO</span><h3>Veo 3</h3><span class="fab">Google DeepMind</span><p class="q"><strong>Use when</strong> you need a short, realistic shot with speech and ambient sound (interview, commercial).</p><p>Strong realism and physics, with speech and ambient sound in the same step.</p><p class="l">Limits: short clip (8 s); Google marks Veo 3 as discontinued in the API in favor of 3.1.</p><div class="meta">Max duration: 8 s · Audio: yes, with lip-sync</div><div class="src"><a href="https://deepmind.google/models/veo/" target="_blank" rel="noopener">source 1</a> · <a href="https://ai.google.dev/gemini-api/docs/veo" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="seedance-fast"><span class="tp">VIDEO</span><h3>Seedance Fast</h3><span class="fab">ByteDance</span><p class="q"><strong>Use when</strong> you want to test several versions of the same scene before making the final one with Seedance 2.0 or 2.5.</p><p>A faster, cheaper version of Seedance 2.0.</p><p class="l">Limits: capped at 720p; not always cheaper—it depends on the pricing table.</p><div class="meta">Max duration: 15 s (likely) · Audio: yes</div><div class="src"><a href="https://blog.segmind.com/seedance-2-vs-seedance-2-fast-how-video-token-pricing-actually-works" target="_blank" rel="noopener">source 1</a></div></div>
+<div class="mod" data-id="kling-2.6"><span class="tp">VIDEO</span><h3>Kling 2.6</h3><span class="fab">Kuaishou</span><p class="q"><strong>Use when</strong> you need a simple 5 to 10 s scene, or want to copy a reference dance or gesture for less than with 3.0.</p><p>Motion Control: copies movement from a reference video.</p><p class="l">Limits: 5 or 10 s clips; no multi-shot; voices only in Chinese and English.</p><div class="meta">Max duration: 10 s · Audio: yes (Chinese and English)</div><div class="src"><a href="https://piapi.ai/kling-2-6" target="_blank" rel="noopener">source 1</a> · <a href="https://vidmuse.ai/blog/kling-26" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="nano-banana-pro"><span class="tp">IMAGE</span><h3>Nano Banana Pro</h3><span class="fab">Google DeepMind</span><p class="q"><strong>Use when</strong> the image has text (poster, cover, sign) or you need a polished keyframe of a character.</p><p>Readable text in images and fine detail, up to 4K.</p><p class="l">Limits: slower than Nano Banana 2.</p><div class="meta">Image</div><div class="src"><a href="https://picsart.com/blog/nano-banana-models-comparison/" target="_blank" rel="noopener">source 1</a></div></div>
+<div class="mod" data-id="nano-banana-2"><span class="tp">IMAGE</span><h3>Nano Banana 2</h3><span class="fab">Google</span><p class="q"><strong>Use when</strong> you need lots of scene images or a quick storyboard.</p><p>Fast and cheap, with quality close to Pro.</p><p class="l">Limits: a little behind Pro in text and fine detail.</p><div class="meta">Image</div><div class="src"><a href="https://wavespeed.ai/blog/posts/nano-banana-2-vs-nano-banana-pro-whats-the-difference" target="_blank" rel="noopener">source 1</a></div></div>
+<div class="mod" data-id="gpt-image-2"><span class="tp">IMAGE</span><h3>GPT Image 2</h3><span class="fab">OpenAI</span><p class="q"><strong>Use when</strong> the frame has lots of text, is a diagram or comic/storyboard grid, or you need to retouch an image.</p><p>Dense text, diagrams, and comic panels; edits without changing the rest.</p><p class="l">Limits: 4K is still in beta; text accuracy rates are conflicting across sources.</p><div class="meta">Image</div><div class="src"><a href="https://www.together.ai/models/gpt-image-2" target="_blank" rel="noopener">source 1</a> · <a href="https://invideo.io/blog/chatgpt-images-2-0-explained/" target="_blank" rel="noopener">source 2</a></div></div>
+<div class="mod" data-id="seedream-5.0"><span class="tp">IMAGE</span><h3>Seedream 5.0</h3><span class="fab">ByteDance</span><p class="q"><strong>Use when</strong> you want an affordable 4K image or to adjust just one part of a frame.</p><p>Affordable 4K and region editing (change just one part).</p><p class="l">Limits: which version (Lite or Pro) MovieFlow uses is not published.</p><div class="meta">Image</div><div class="src"><a href="https://www.technobezz.com/news/bytedance-launches-seedream-50-image-model-as-a-lower-cost-alternative-to-googles-nano-banana-pro" target="_blank" rel="noopener">source 1</a></div></div>
+  </div>
+  <h3 style="margin-top:30px">Words used on the cards</h3>
+  <div class="gl">
+    <div><strong>Lip-sync</strong> — the character's mouth moves with the speech.</div>
+    <div><strong>Multi-shot</strong> — several shots (camera cuts) generated at once with the same character.</div>
+    <div><strong>Shot and reverse shot</strong> — the camera alternates between two people talking.</div>
+    <div><strong>Keyframe</strong> — the main image that defines what a character or scene will look like.</div>
+    <div><strong>Storyboard</strong> — a sequence of scene drawings made before the film.</div>
+    <div><strong>Reference</strong> — a photo, video, or audio file you send the model to copy a face, style, or movement.</div>
+    <div><strong>720p, 1080p, 2K, 4K</strong> — resolution: the higher it is, the sharper the image (and generally the more expensive).</div>
+    <div><strong>Motion Control</strong> — the model copies movement from one of your videos (dance, gesture).</div>
+    <div><strong>Agent V2</strong> — MovieFlow mode where AI builds the entire film from your idea.</div>
+  </div>
+  <h3 style="margin-top:30px">Video side by side</h3>
+  <p class="sub" style="font-size:.85rem">On a phone, swipe the table sideways to see all the columns.</p>
+  <div class="scroll"><table class="tbl">
+    <tr><th>Model</th><th>Maker</th><th>Max duration</th><th>Audio</th><th>Highlight</th></tr>
+<tr><td><strong>Seedance 2.5</strong></td><td>ByteDance</td><td>30 s</td><td>yes</td><td>long shot (up to 30 s) with sound and many references</td></tr>
+<tr><td><strong>MovieFlow 2.0 Ultra</strong></td><td>MovieFlow</td><td>not confirmed</td><td>not confirmed</td><td>the site's fastest and cheapest: 5 s of video in 10 s, US$0.008 per second</td></tr>
+<tr><td><strong>MiniMax H3</strong></td><td>MiniMax (Hailuo)</td><td>~15 s (not confirmed)</td><td>yes</td><td>native 2K video, multiple references, and edits to a detail without remaking the clip</td></tr>
+<tr><td><strong>Kling 3.0</strong></td><td>Kuaishou</td><td>15 s</td><td>yes, with lip-sync</td><td>multi-shot: 2 to 6 connected shots in one generation, with the same character</td></tr>
+<tr><td><strong>Seedance 2.0</strong></td><td>ByteDance</td><td>15 s</td><td>yes</td><td>up to 9 images + 3 videos + 3 audio references, called in the prompt (@Image1, @Video1)</td></tr>
+<tr><td><strong>Vidu Q3 Pro</strong></td><td>ShengShu</td><td>16 s</td><td>yes</td><td>dialogue with multiple speakers, automatic cuts, good at anime</td></tr>
+<tr><td><strong>Veo 3</strong></td><td>Google DeepMind</td><td>8 s</td><td>yes, with lip-sync</td><td>strong realism and physics, with speech and ambient sound in the same step</td></tr>
+<tr><td><strong>Seedance Fast</strong></td><td>ByteDance</td><td>15 s (likely)</td><td>yes</td><td>a faster, cheaper version of Seedance 2.0</td></tr>
+<tr><td><strong>Kling 2.6</strong></td><td>Kuaishou</td><td>10 s</td><td>yes (Chinese and English)</td><td>Motion Control: copies movement from a reference video</td></tr>
+  </table></div>
+</div></section>
+
+<section id="fluxo"><div class="wrap">
+  <span class="chip">How it works</span>
+  <h2>From idea to film, for less</h2>
+  <p class="sub">A credit-saving workflow: start with a cheap draft, then use an expensive model only for the scene that matters.</p>
+  <div class="flow">
+    <span>Idea in one sentence</span><span class="arr">→</span>
+    <span>Agent builds the story and storyboard</span><span class="arr">→</span>
+    <span>Draft in MovieFlow 2.0 Ultra</span><span class="arr">→</span>
+    <span>Character image (Nano Banana Pro)</span><span class="arr">→</span>
+    <span>Final scene in the right model</span><span class="arr">→</span>
+    <span>Adjust one detail (MiniMax H3)</span>
+  </div>
+  <div class="ex" style="margin-top:22px">
+    <figure><img src="../assets/ex3.jpg" alt="MovieFlow creation screen with the idea box" loading="lazy"><figcaption>Write your idea, choose the language, duration, and format, then click Create.</figcaption></figure>
+    <figure><img src="../assets/ex1.jpg" alt="Animated scene with a badger and a felt fox" loading="lazy"><figcaption>A children's story made from scratch from a single sentence.</figcaption></figure>
+  </div>
+</div></section>
+
+<section id="guia"><div class="wrap">
+  <span class="chip">Step-by-step guide</span>
+  <h2>Use the guide and chooser</h2>
+  <p class="sub">The easiest way is to use the <a href="#escolher">Which to use</a> buttons on this page, with no installation. To run the chooser in the terminal: Python 3 (on Windows, use <code>python</code> instead of <code>python3</code>) and Git—or download the ZIP from GitHub (Code button → Download ZIP). It runs on your computer, with no account or key.</p>
+
+  <div class="step"><div class="b">1</div><div>
+    <h3>Download the project</h3>
+    <p>The repository contains data for the 13 models (<code>modelos.json</code>) and the chooser (<code>escolher.py</code>).</p>
+<pre><span class="k">git clone https://github.com/inematds/movieflow-modelos.git</span>
+<span class="k">cd movieflow-modelos</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">2</div><div>
+    <h3>Describe the scene and see the recommended model</h3>
+    <p>Describe the scene in a few words (the tool understands Portuguese keywords). The chooser compares them with each model's tags and shows the top 3, along with “use when” guidance and limits.</p>
+<pre><span class="k">python3 escolher.py "conversa entre dois personagens em anime"</span>  <span class="c"># 1. Vidu Q3 Pro  2. Kling 3.0  3. Veo 3</span>
+<span class="k">python3 escolher.py "cartaz com texto do filme"</span>  <span class="c"># 1. Nano Banana Pro  2. GPT Image 2</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">3</div><div>
+    <h3>View the list or a model's details</h3>
+    <p>The list filters by video or image; the details show highlights, limits, and sources.</p>
+<pre><span class="k">python3 escolher.py --lista --tipo video</span>
+<span class="k">python3 escolher.py --modelo kling-3.0</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">4</div><div>
+    <h3>In MovieFlow, switch models by scene</h3>
+    <p>Create an account at movieflow.ai (it comes with trial credits), make a draft with the cheap model, then redo only the important scenes with the recommended model. For a character that appears in multiple scenes, create an image of them first and use it as a reference.</p>
+<pre><span class="s">https://movieflow.ai</span>  <span class="c"># Agent V2 → idea → language, duration, format → Create</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">5</div><div>
+    <h3>Keep the data up to date</h3>
+    <p>Models change quickly. When MovieFlow changes its list, edit <code>modelos.json</code> and rebuild the page.</p>
+<pre><span class="k">python3 montar_guia.py</span>  <span class="c"># generates guia/index.html from modelos.json</span></pre>
+  </div></div>
+</div></section>
+
+<section id="preco"><div class="wrap">
+  <span class="chip">What it costs</span>
+  <h2>No longer free and unlimited</h2>
+  <p class="sub">What can be confirmed today, and what cannot yet.</p>
+  <div class="grid g3">
+    <div class="card"><h3>🎟️ Signup credits</h3><p>New accounts get credits to try it (100 credits, according to a November 2026 pricing directory). It's a trial, not unlimited use.</p></div>
+    <div class="card"><h3>⚡ US$0.008 per second</h3><p>Price announced on the site itself for MovieFlow 2.0: 5 seconds of video for about 4 cents.</p></div>
+    <div class="card"><h3>📅 Standard plan</h3><p>US$19 per month with 1,800 credits and 1080p downloads without a watermark (Kingy directory, November 2026). Credits reset every 31 days.</p></div>
+  </div>
+  <p class="note">The credit cost for each model is only visible when signed in, and the site's plan table loads with JavaScript. Check movieflow.ai/pricing before subscribing.</p>
+</div></section>
+
+<section id="exemplos"><div class="wrap">
+  <span class="chip">Examples</span>
+  <h2>Styles MovieFlow can create</h2>
+  <p class="sub">Scenes generated on the platform: cinema, horror, felt animation.</p>
+  <div class="ex">
+    <figure><img src="../assets/ex2.jpg" alt="Couple at a masquerade ball, cinematic style" loading="lazy"><figcaption>Cinema: a masquerade ball with film-style camera work and lighting.</figcaption></figure>
+    <figure><img src="../assets/ex4.jpg" alt="Horror scene with a haunted bride" loading="lazy"><figcaption>Horror: the same tool, a different style.</figcaption></figure>
+  </div>
+</div></section>
+
+<section id="roadmap"><div class="wrap">
+  <span class="chip">Roadmap</span>
+  <h2>Next steps</h2>
+  <p class="sub">What still needs measuring.</p>
+  <div class="phase"><div class="tag">Done</div><div class="d"><strong>All 13 models with sources</strong><span>Data, chooser, and guide in Portuguese, English, and Spanish.</span></div></div>
+  <div class="phase"><div class="tag">Next</div><div class="d"><strong>Credit cost per model</strong><span>Measure inside the account how many credits each model uses per second.</span></div></div>
+  <div class="phase"><div class="tag">Later</div><div class="d"><strong>Same scene across all 9 video models</strong><span>Compare side by side with the same prompt.</span></div></div>
+</div></section>
+
+<footer>
+  <div class="wrap">
+    <div class="pill">MovieFlow</div><div class="pill">Python 3</div><div class="pill">JSON</div>
+    <p style="margin-top:18px">MovieFlow: 13 models · data from 06/11/2026 ·
+      <a href="https://github.com/inematds/movieflow-modelos">inematds/movieflow-modelos</a> ·
+      <a href="https://inema.club">INEMA.CLUB</a></p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var KEY='movieflow-modelos-theme';
+    var b=document.body, t=document.getElementById('themeToggle');
+    try{ if(localStorage.getItem(KEY)==='light'){ b.classList.add('light'); t.textContent='☀️'; } }catch(e){}
+    t.addEventListener('click',function(){
+      var light=b.classList.toggle('light');
+      t.textContent=light?'☀️':'🌙';
+      try{ localStorage.setItem(KEY, light?'light':'dark'); }catch(e){}
+    });
+    var bts=document.querySelectorAll('#need button'), mods=document.querySelectorAll('#mods .mod');
+    bts.forEach(function(bt){ bt.addEventListener('click',function(){
+      var ativo=bt.classList.contains('on');
+      bts.forEach(function(x){x.classList.remove('on');});
+      mods.forEach(function(m){m.classList.remove('on','off');});
+      if(ativo){ document.getElementById('resp').hidden=true; return; }
+      bt.classList.add('on');
+      var ids=bt.getAttribute('data-ids').split(',');
+      mods.forEach(function(m){ m.classList.add(ids.indexOf(m.getAttribute('data-id'))>=0?'on':'off'); });
+      var nomes=[];mods.forEach(function(m){ if(m.classList.contains('on')) nomes.push(m.querySelector('h3').textContent); });
+      var r=document.getElementById('resp'); r.hidden=false; r.textContent=bt.textContent+': '+nomes.join(', ');
+    }); });
+  })();
+</script>
+</body>
+</html>

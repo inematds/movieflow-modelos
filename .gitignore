@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+guia/assets/*.codex.log
+logs-gen/
