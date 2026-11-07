@@ -8,6 +8,10 @@
 
 O MovieFlow (movieflow.ai) é um estúdio de filmes com IA: você escreve uma ideia e ele monta a história, os personagens, as cenas e o filme. Por trás dele há 13 modelos de outras empresas (Seedance, Kling, Veo, MiniMax, Vidu, Nano Banana, GPT Image e outros), e cada um é melhor numa coisa. Este projeto reúne, num guia e num arquivo de dados, o que cada modelo faz, os limites e quando usar. Para usar é só ler a página; quem quiser pode rodar o escolhedor no terminal com Python, sem instalar nada.
 
+## 🎬 Vídeo
+
+https://www.youtube.com/watch?v=0zyz-H-1qXQ (16:9) · short: https://www.youtube.com/watch?v=WizdRuVKl1U
+
 ## 📖 Guia de uso
 
 Guia completo (landing + passo a passo): **https://inematds.github.io/movieflow-modelos/guia/**

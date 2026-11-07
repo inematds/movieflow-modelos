@@ -101,6 +101,7 @@ body = f"""
       <div class="cta">
         <a class="btn" href="#escolher">Escolher meu modelo</a>
         <a class="btn ghost" href="{REPO}" target="_blank" rel="noopener">Ver no GitHub</a>
+        <a class="btn ghost" href="https://www.youtube.com/watch?v=0zyz-H-1qXQ" target="_blank" rel="noopener">▶ Assistir ao vídeo</a>
       </div>
     </div>
     <figure><img src="assets/banner.jpg" alt="Banner MovieFlow: 13 modelos — qual modelo usar em cada cena do seu filme de IA"></figure>
